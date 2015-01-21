@@ -1,3 +1,7 @@
+/**
+ * This file contains the server side code.
+ */
+
 var net = require('net');
 var cp = require("child_process");
 var datastructure = require("./datastructure");
@@ -14,25 +18,36 @@ process.argv.forEach(function (val, index, array) {
   }
 });
 
-//Forking the process. This process will handle the operations related to database file reads and file writes.
+// Forking the process.
+// This child process will handle the operations related to database file reads and file writes.
+// This child process is responsible for reading and writing to RDB snapshot file.
+// When ever it reads from  RDB snap shot file it updates the local cache.
+
 var childProcess = cp.fork('./childProcess.js');
 childProcess.send({"message":"RDBFILE", "data":datastructure.rdbfile});
 
 
+// If the message from the parent process is close, then exit
 childProcess.on('message', function(m) {
   if(m=="close") {
   	process.exit();
   }
 });
+
 //Handles the SIGINT event.
+// As soon as the SIGINT comes send message "close" to all the child processes.
 process.on('SIGINT', function(){
   childProcess.send({'message': 'SIGINT'});
 });
 
 console.log("Loading the dbsnapshot... \n");
-//Reads the rdb file when the server starts.
+
+//If the rdb file aldready exists, it loads the local cache.
 datastructure.fs.readFile(datastructure.rdbfile, function (err,data) {
     if (err) throw err;
+
+    // It reads the file line by line.
+    // Check whether its 
     datastructure.rdbfiledata = data;    
     var split_data = data.toString().split("@@@");
     for(var i=0; i<split_data.length; i++) {
@@ -51,23 +66,26 @@ datastructure.fs.readFile(datastructure.rdbfile, function (err,data) {
 
 /*
 * Opening the telnet connection over port no 15000.
+* As soon as the server starts, handle the commands from the client side.
 */
 function createRedisServer() {
 
-var server = net.createServer(function(socket) {
+  var server = net.createServer(function(socket) {
 	
     socket.setEncoding('utf8');
     socket.on('data', function(data) {
-        //Hnadles the commands from client side.
+        // Handles the commands from client side.
+        // The data is just the command string
+        // Based on the first word in the command string, the server handles accordingly.
         var recieved_string = data.toString().substring(0, data.length-2);
         recieved_string_split = recieved_string.split(" ");
         var temp_bit;
         switch(recieved_string_split[0]) {
-        	case "ZSET":
+        	case "SET":
         	zgetset.zset(recieved_string_split[1], recieved_string_split[2]);
         	childProcess.send({"message":recieved_string, 'zgetsetjsondata': datastructure.jsondata['zgetset'], 'type' : 'string'});
         	break;
-        	case "ZGET":
+        	case "GET":
         	var value = zgetset.zget(recieved_string_split[1]);
         	socket.write(value + "\n");
         	break;

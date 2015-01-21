@@ -1,8 +1,10 @@
 var net = require('net');
 
+/**
+ * This file contains the client side tcp/ip code.
+ */
+
 var sys = require("sys");
-
-
 
 var HOST = '127.0.0.1';
 var PORT = "15000";
@@ -17,7 +19,7 @@ client.connect(PORT, HOST, function() {
 
     stdin.addListener("data", function(d) {
     // note:  d is an object, and when converted to a string it will
-    // end with a linefeed.  so we (rather crudely) account for that  
+    // end with a line feed.  so we (rather crudely) account for that  
     // with toString() and then substring() 
     client.write(d.toString());
     console.log("you entered: [" + 
@@ -35,7 +37,7 @@ client.on('data', function(data) {
       
 });
 
-// Add a 'close' event handler for the client socket
+// Add a 'connection close' event handler for the client socket
 client.on('close', function() {
     console.log('Connection closed');
 });

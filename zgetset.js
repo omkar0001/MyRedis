@@ -4,11 +4,19 @@
  */
 
 var datastructure = require("./datastructure");
+
+/**
+ * This handles the set command.
+ */
 var zset = function(key, value) {
   datastructure.jsondata['zgetset'][key] = ["string",value];
 
 }
 exports.zset = zset;
+
+/**
+ * This handles the get command.
+ */
 var zget = function(key) {
 	if(datastructure.jsondata['zgetset'][key][0] == "string") {
 	  if(key in datastructure.jsondata.zgetset)
@@ -18,6 +26,10 @@ var zget = function(key) {
 }
 exports.zget = zget;
 
+
+/**
+ * This handles the set bit command.
+ */
 var zsetbit = function(key, position, value) {
 	var current_value = 0;
 	if(key in datastructure.jsondata.zgetset) {
@@ -40,6 +52,9 @@ var zsetbit = function(key, position, value) {
 }
 exports.zsetbit = zsetbit;
 
+/**
+ * This handles the getbit command.
+ */
 var zgetbit = function(key, position) {
 	if(key in datastructure.jsondata.zgetset) {
 		if(datastructure.jsondata.zgetset[key][0] == 'bits')
@@ -64,6 +79,7 @@ var convertLineCommandToAod = function(line, zgetsetjsondata, type) {
 exports.convertLineCommandToAod = convertLineCommandToAod;
 
 exports.zgetbit = zgetbit;
+
 //Converts the given line from aod file to rdf and places in the rdffiledata.
 var convertLineAodToRdf = function(line) {
   var line_split = line.toString().split(" ");
@@ -86,6 +102,7 @@ var convertLineAodToRdf = function(line) {
 
 }
 exports.convertLineAodToRdf = convertLineAodToRdf;
+
 //Converts the RDB line snapshot to json.
 var convertLineRdbToJson = function(line) {
   var line_split = line.split(" ");

@@ -4,7 +4,12 @@
  */
 
 var datastructure = require("./datastructure");
+
+/**
+ * This is the implementation of zadd command.
+ */
 var zadd = function(key, score, value) {
+
   //Check if the key exists aldready in the object.
   if(key in datastructure.jsondata['zadd']) {
     //Check if the score exists in key.
@@ -22,6 +27,10 @@ var zadd = function(key, score, value) {
   }
 }
 exports.zadd = zadd;
+
+/**
+ * This is the implementation of zrange command.
+ */
 var zrange = function(key, from_score, to_score) {
   var temp_values = Array();	
   if(key in datastructure.jsondata['zadd']) {
@@ -53,6 +62,9 @@ var zrange = function(key, from_score, to_score) {
 
 exports.zrange = zrange;
 
+/**
+ * This is the implementation of zcard command.
+ */
 var zcard = function(key) {
   var total_count = 0;
   if(key in datastructure.jsondata['zadd']) {
@@ -66,6 +78,10 @@ var zcard = function(key) {
 }
 exports.zcard = zcard;
 
+
+/**
+ * This is the implementation of zcount command.
+ */
 var zcount = function(key, from_score, to_score) {
   var cardinality = 0;
 
@@ -99,7 +115,9 @@ var zcount = function(key, from_score, to_score) {
 }
 
 exports.zcount = zcount;
-//Converts the given line from aod file to rdf and places in the rdffiledata.
+
+
+//Converts each command string given by user to aod format.
 var convertLineCommandToAod = function(line, zaddjsondata) {
   var line_split = line.split(" ");
   key = line_split[1];
@@ -139,6 +157,8 @@ var convertLineAodToRdf = function(line) {
 
 }
 exports.convertLineAodToRdf = convertLineAodToRdf;
+
+//Convert each line in rdb to json data, thats nothing but local cache.
 var convertLineRdbToJson = function(line) {
   var line_split = line.split(" ");
   var key = line_split[1];

@@ -26,6 +26,7 @@ eventEmitter.on('snapshotupdated', function() {
 });  
 
 var offset;
+
 //Responsible for converting the AOD file content to RDB file content.
 var aodtordb = function() {
     
